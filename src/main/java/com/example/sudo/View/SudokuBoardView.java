@@ -31,6 +31,7 @@ public class SudokuBoardView extends Pane {
     private ArrayList <TextField> listTxtAux;
     private Sudoku sudoku;
     private ArrayList<TextField> generatedTxtList;
+    private AlertHandler alertHandler;
 
     /**
      * Constructor de la clase. Inicializa los componentes y crea un nuevo objeto de Sudoku.
@@ -60,6 +61,7 @@ public class SudokuBoardView extends Pane {
         listTxtAux = new ArrayList();
         Sudoku sudoku;
         generatedTxtList = new ArrayList<TextField>();
+        this.alertHandler = new AlertAdapter();
     }
     /**
      * Crea y configura los campos de texto que representan cada celda del Sudoku,
@@ -283,6 +285,7 @@ public class SudokuBoardView extends Pane {
             for (int j = 0; j < listTxt[0].length; j++) {
                 if(listTxt[i][j].getText().isEmpty()){
                     System.out.println("Eso esta incompleto mano");
+                    alertHandler.showError("Incompleto");
                     return;
                 } else {
                     sudo[i][j] = Integer.parseInt(listTxt[i][j].getText());
@@ -292,9 +295,11 @@ public class SudokuBoardView extends Pane {
         sudoku.setSudoku(sudo);
         sudoku.showSudoku();
         if (sudoku.winCheck()){
+            alertHandler.showSuccess("Felicidades, completaste el sudoku");
             System.out.println("completado exitosamente, felicidades menor");
         } else {
             System.out.println("No hay solución pa");
+            alertHandler.showError("Sudoku incorrecto o sin solución");
         }
     }
 
