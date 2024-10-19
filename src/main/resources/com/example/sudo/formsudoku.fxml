@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<Pane fx:id="panelFondo" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="420.0" prefWidth="540.0" style="-fx-background-color: #323a45;" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.sudo.Controller.SudokuController">
+    <children>
+        <Label layoutX="36.0" layoutY="21.0" style="-fx-font-family: Montserrat; -fx-text-fill: #d1d1d1; -fx-font-weight: bold;" text="SUDOKU" textFill="WHITE">
+            <font>
+                <Font name="Tempus Sans ITC" size="30.0" />
+            </font>
+        </Label>
+        <VBox alignment="CENTER" layoutX="373.0" layoutY="26.0" prefHeight="381.0" prefWidth="154.0" spacing="20.0">
+            <children>
+                <Button mnemonicParsing="false" onAction="#onNewGamePressedButton" style="-fx-background-color: #5dc1b9; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 30; -fx-cursor: hand;" text="Nueva partida">
+                    <font>
+                        <Font size="16.0" />
+                    </font>
+                </Button>
+                <Button mnemonicParsing="false" prefHeight="35.0" prefWidth="126.0" style="-fx-background-color: #5dc1b9; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 30; -fx-cursor: hand;" text="Limpiar">
+                    <font>
+                        <Font size="16.0" />
+                    </font>
+                </Button>
+                <Button mnemonicParsing="false" onAction="#onResolveButton" prefHeight="35.0" prefWidth="124.0" style="-fx-background-color: #5dc1b9; -fx-text-fill: white; -fx-background-radius: 30; -fx-font-weight: bold; -fx-cursor: hand;" text="Resolver">
+                    <font>
+                        <Font size="16.0" />
+                    </font>
+                </Button>
+                <Button mnemonicParsing="false" onAction="#onValidateButton" prefHeight="35.0" prefWidth="122.0" style="-fx-background-color: #5dc1b9; -fx-text-fill: white; -fx-background-radius: 30; -fx-font-weight: bold; -fx-cursor: hand;" text="Comprobar">
+                    <font>
+                        <Font size="16.0" />
+                    </font>
+                </Button>
+                <Button mnemonicParsing="false" onAction="#onHelpButton" style="-fx-background-color: #03fc6f; -fx-text-fill: white; -fx-background-radius: 30; -fx-font-weight: bold; -fx-cursor: hand;" text="Ayuda">
+                    <font>
+                        <Font size="18.0" />
+                    </font>
+                </Button>
+            </children>
+            <opaqueInsets>
+                <Insets />
+            </opaqueInsets>
+        </VBox>
+    </children>
+</Pane>
