@@ -31,6 +31,7 @@ public class SudokuBoardView extends Pane {
     private ArrayList <TextField> listTxtAux;
     private Sudoku sudoku;
     private ArrayList<TextField> generatedTxtList;
+    private AlertHandler alertHandler;
 
     /**
      * Constructor de la clase. Inicializa los componentes y crea un nuevo objeto de Sudoku.
@@ -60,6 +61,7 @@ public class SudokuBoardView extends Pane {
         listTxtAux = new ArrayList();
         Sudoku sudoku;
         generatedTxtList = new ArrayList<TextField>();
+        this.alertHandler = new AlertAdapter();
     }
     /**
      * Crea y configura los campos de texto que representan cada celda del Sudoku,
@@ -117,6 +119,23 @@ public class SudokuBoardView extends Pane {
     public void generateSudoku() {
         clearTxt();
         sudoku.generateSudoku(listTxt);
+        int [][] sudokuGenerated = sudoku.getSudoku();
+        for(int i = 0; i < sudokuGenerated.length; i++) {
+            for (int j = 0; j < sudokuGenerated[0].length; j++) {
+                if (sudokuGenerated[i][j] != 0) {
+                    listTxt[i][j].setText(String.valueOf(sudokuGenerated[i][j]));
+                    generatedTxtList.add(listTxt[i][j]);
+                    listTxt[i][j].setEditable(false);
+                }
+            }
+        }
+    }
+    /**
+     * Completa el tablero de Sudoku mostrando todos los números en los campos de texto.
+     */
+
+    public void completeSudoku(){
+        sudoku.showSudoku();
         int [][] sudokuGenerated = sudoku.getSudoku();
         for(int i = 0; i < sudokuGenerated.length; i++) {
             for (int j = 0; j < sudokuGenerated[0].length; j++) {
@@ -266,6 +285,7 @@ public class SudokuBoardView extends Pane {
             for (int j = 0; j < listTxt[0].length; j++) {
                 if(listTxt[i][j].getText().isEmpty()){
                     System.out.println("Eso esta incompleto mano");
+                    alertHandler.showError("Incompleto");
                     return;
                 } else {
                     sudo[i][j] = Integer.parseInt(listTxt[i][j].getText());
@@ -275,9 +295,11 @@ public class SudokuBoardView extends Pane {
         sudoku.setSudoku(sudo);
         sudoku.showSudoku();
         if (sudoku.winCheck()){
+            alertHandler.showSuccess("Felicidades, completaste el sudoku");
             System.out.println("completado exitosamente, felicidades menor");
         } else {
             System.out.println("No hay solución pa");
+            alertHandler.showError("Sudoku incorrecto o sin solución");
         }
     }
 

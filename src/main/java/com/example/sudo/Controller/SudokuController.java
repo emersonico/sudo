@@ -1,5 +1,7 @@
 package com.example.sudo.Controller;
 
+import com.example.sudo.View.AlertAdapter;
+import com.example.sudo.View.AlertHandler;
 import com.example.sudo.View.SudokuBoardView;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -16,6 +18,7 @@ public class SudokuController {
 
     @FXML
     private Pane panelFondo;
+    private AlertHandler alertHandler;
 
     /**
      * Inicializa los componentes de la vista del Sudoku.
@@ -27,6 +30,7 @@ public class SudokuController {
      */
 
     public void startComponents() {
+        this.alertHandler = new AlertAdapter();
         this.tableroSudoku = new SudokuBoardView();
         tableroSudoku.setTxtAltura(36);
         tableroSudoku.setTxWidth(36);
@@ -63,7 +67,11 @@ public class SudokuController {
      */
     @FXML
     void onNewGamePressedButton(ActionEvent event) {
-        tableroSudoku.generateSudoku();
+
+        alertHandler.showConfirmation("¿Seguro que desea iniciar una nueva partida?", () -> {
+            tableroSudoku.generateSudoku();
+            System.out.println("Nueva partida iniciada.");
+        });
         System.out.println("Hola");
     }
 
@@ -91,9 +99,16 @@ public class SudokuController {
         tableroSudoku.help();
     }
 
+    /**
+     * Maneja el evento de click en el botón "Resolver".
+     * Resuelve el Sudoku automáticamente.
+     * (La implementación del algoritmo de resolución se delega a la clase SudokuBoardView)
+     *
+     * @param event El evento de click del botón.
+     */
     @FXML
-    public void onResolveButton(ActionEvent event) {
-        // Lógica del botón
-    }
+    void onResolveButton(ActionEvent event) {
+        // tableroSudoku.resolver();
+        tableroSudoku.completeSudoku();}
 
 }
