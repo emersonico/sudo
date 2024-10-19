@@ -91,9 +91,16 @@ public class SudokuController {
         tableroSudoku.help();
     }
 
+    /**
+     * Maneja el evento de click en el botón "Resolver".
+     * Resuelve el Sudoku automáticamente.
+     * (La implementación del algoritmo de resolución se delega a la clase SudokuBoardView)
+     *
+     * @param event El evento de click del botón.
+     */
     @FXML
-    public void onResolveButton(ActionEvent event) {
-        // Lógica del botón
-    }
+    void onResolveButton(ActionEvent event) {
+        // tableroSudoku.resolver();
+        tableroSudoku.completeSudoku();}
 
 }

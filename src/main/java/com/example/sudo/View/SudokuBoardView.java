@@ -128,6 +128,23 @@ public class SudokuBoardView extends Pane {
             }
         }
     }
+    /**
+     * Completa el tablero de Sudoku mostrando todos los números en los campos de texto.
+     */
+
+    public void completeSudoku(){
+        sudoku.showSudoku();
+        int [][] sudokuGenerated = sudoku.getSudoku();
+        for(int i = 0; i < sudokuGenerated.length; i++) {
+            for (int j = 0; j < sudokuGenerated[0].length; j++) {
+                if (sudokuGenerated[i][j] != 0) {
+                    listTxt[i][j].setText(String.valueOf(sudokuGenerated[i][j]));
+                    generatedTxtList.add(listTxt[i][j]);
+                    listTxt[i][j].setEditable(false);
+                }
+            }
+        }
+    }
 
 
 
