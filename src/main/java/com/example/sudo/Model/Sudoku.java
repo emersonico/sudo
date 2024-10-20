@@ -2,6 +2,9 @@ package com.example.sudo.Model;
 
 import javafx.scene.control.TextField;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -11,6 +14,7 @@ import java.util.Random;
 
 public class Sudoku {
     private int sudoku[][];
+    private int[][] solucion; // Matriz para almacenar la solucion
 
     /**
      * Constructor que inicializa un tablero vacío de Sudoku.
@@ -55,128 +59,110 @@ public class Sudoku {
     }
 
     /**
-     * Genera un nuevo tablero de Sudoku aleatoriamente.
-     * Intenta resolver el Sudoku generado y si es válido, lo asigna como el tablero actual.
-     * Si no es posible resolverlo, genera un nuevo tablero.
+     * Genera un nuevo Sudoku resolviendo el tablero completamente y luego
+     * escondiendo algunos números para que el jugador los complete.
      *
-     * @param listTxt Matriz de campos de texto que representan el tablero en la interfaz gráfica.
+     * @param listTxt La matriz de TextFields utilizada para representar el tablero de Sudoku en la interfaz gráfica.
      */
+
 
     public void generateSudoku(TextField[][] listTxt) {
-        clearSudoku();
+        clearSudoku(); // Limpia el tablero
+        if (resolveSudoku()) { // Resuelve completamente el sudoku
+            solucion = copyMatrix(sudoku);
+            hideNumber(listTxt); // Esconde los numeros para dejar solo 2 por cuadrante
+        } else {
+            System.out.println("Error: No se pudo resolver el Sudoku.");
+        }
+    }
+    /**
+     * Esconde ciertos números en el tablero de Sudoku, dejando solo dos números visibles por cuadrante.
+     * Luego actualiza la interfaz gráfica con los cambios.
+     *
+     * @param listTxt La matriz de TextFields utilizada para representar el tablero de Sudoku en la interfaz gráfica.
+     */
+
+    private void hideNumber(TextField[][] listTxt) {
         Random random = new Random();
-
-        boolean sudokuValid = false;
-        while (!sudokuValid) {
-            clearSudoku();
-
-            generateQuadrant(0, 0, random, listTxt); // Cuadrante 1
-            generateQuadrant(0, 3, random, listTxt); // Cuadrante 2
-            generateQuadrant(2, 0, random, listTxt); // Cuadrante 3
-            generateQuadrant(2, 3, random, listTxt); // Cuadrante 4
-            generateQuadrant(4, 0, random, listTxt); // Cuadrante 5
-            generateQuadrant(4, 3, random, listTxt); // Cuadrante 6
-
-            if (resolveSudoku()) {
-                sudokuValid = true;
-            } else {
-                System.out.println(" nno se pudo resolver el sudoku generando uno nuevo ");
+        for (int firstRow = 0; firstRow < 6; firstRow += 2) {
+            for (int colInicio = 0; colInicio < 6; colInicio += 3) {
+                hideBlockNumber(firstRow, colInicio, random);
             }
         }
-
-        limitQuadrantNumbers(listTxt);
+        // También actualizar la interfaz de usuario
+        updateInterface(listTxt);
     }
 
     /**
-     * Genera dos números válidos en un cuadrante específico del tablero.
-     * Verifica que los números sean válidos en su fila, columna y bloque.
+     * Esconde hasta 4 números en un cuadrante de 2x3 en el tablero de Sudoku.
      *
-     * @param firstRow    La fila inicial del cuadrante.
-     * @param firstColumn La columna inicial del cuadrante.
-     * @param random      Objeto de la clase Random para generar números aleatorios.
-     * @param listTxt     Matriz de campos de texto que representan el tablero en la interfaz gráfica.
+     * @param firstRow La fila de inicio del cuadrante.
+     * @param firstCol La columna de inicio del cuadrante.
+     * @param random     Una instancia de la clase Random para generar posiciones aleatorias.
      */
 
-
-    private void generateQuadrant(int firstRow, int firstColumn, Random random, TextField[][] listTxt ) {
+    private void hideBlockNumber(int firstRow, int firstCol, Random random) {
         int count = 0;
-        while (count < 2) {
-            int fila = random.nextInt(2) + firstRow;
-            int col = random.nextInt(3) + firstColumn;
-            if (sudoku[fila][col] == 0) {
-                int num = random.nextInt(6) + 1;
-                if (isNumberValid(fila, col, num, listTxt)) {
-                    sudoku[fila][col] = num;
-                    count++;
-                }
+        while (count < 4) { // Queremos eliminar hasta 4 números en cada cuadrante para dejar solo 2
+            int row = random.nextInt(2) + firstRow;
+            int col = random.nextInt(3) + firstCol;
+            if (sudoku[row][col] != 0) {
+                sudoku[row][col] = 0; // Esconder el número
+                count++;
             }
         }
     }
 
     /**
-     * Elimina números en exceso en cada cuadrante del Sudoku para que no haya más de dos números por cuadrante.
+     * Actualiza la interfaz gráfica del Sudoku, colocando los números visibles en los TextFields.
+     * Los TextFields correspondientes a números ocultos se dejan editables.
      *
-     * @param listTxt Matriz de campos de texto que representan el tablero en la interfaz gráfica.
+     * @param listTxt La matriz de TextFields utilizada para representar el tablero de Sudoku en la interfaz gráfica.
      */
 
-    private void limitQuadrantNumbers(TextField[][] listTxt) {
-        eliminateQuadrantNumbers(0, 0, listTxt); // Primer cuadrante (fila 0-1, columna 0-2)
-        eliminateQuadrantNumbers(0, 3, listTxt); // Segundo cuadrante (fila 0-1, columna 3-5)
-        eliminateQuadrantNumbers(2, 0, listTxt); // Tercer cuadrante (fila 2-3, columna 0-2)
-        eliminateQuadrantNumbers(2, 3, listTxt); // Cuarto cuadrante (fila 2-3, columna 3-5)
-        eliminateQuadrantNumbers(4, 0, listTxt); // Quinto cuadrante (fila 4-5, columna 0-2)
-        eliminateQuadrantNumbers(4, 3, listTxt); // Sexto cuadrante (fila 4-5, columna 3-5)
-    }
-
-    /**
-     * Elimina números aleatorios de un cuadrante para dejar solo dos números en dicho cuadrante.
-     *
-     * @param firstRow    La fila inicial del cuadrante.
-     * @param firstColumn La columna inicial del cuadrante.
-     * @param listTxt     Matriz de campos de texto que representan el tablero en la interfaz gráfica.
-     */
-
-    private void eliminateQuadrantNumbers(int firstRow, int firstColumn, TextField[][] listTxt) {
-        Random random = new Random();
-        int[][] indices = new int[6][2];
-        int index = 0;
-        // Guardamos las posiciones de los numeros en el cuadrante
-        for (int i = firstRow; i < firstRow + 2; i++) { // 2 filas por cuadrante
-            for (int j = firstColumn; j < firstColumn + 3; j++) { // 3 columnas por cuadrante
+    private void updateInterface(TextField[][] listTxt) {
+        for (int i = 0; i < 6; i++) {
+            for (int j = 0; j < 6; j++) {
                 if (sudoku[i][j] != 0) {
-                    indices[index][0] = i;
-                    indices[index][1] = j;
-                    index++;
+                    listTxt[i][j].setText(String.valueOf(sudoku[i][j]));
+                    listTxt[i][j].setEditable(false);
+                } else {
+                    listTxt[i][j].setText("");
+                    listTxt[i][j].setEditable(true);
                 }
             }
-        }
-        // Si hay más de 2 numeros en el cuadrante  eliminar el exceso
-        while (index > 2) {
-            int randomIndex = random.nextInt(index);
-            int row = indices[randomIndex][0];
-            int col = indices[randomIndex][1];
-            sudoku[row][col] = 0; // Eliminar el numero
-            indices[randomIndex] = indices[--index]; // Actualizar la lista de indices
         }
     }
 
     /**
-     * Comprueba si el Sudoku actual cumple con las reglas del juego.
+     * Crea una copia de la matriz proporcionada.
      *
-     * @return true si el Sudoku es válido, false de lo contrario.
+     * @param original La matriz original que se va a copiar.
+     * @return Una nueva matriz que es una copia exacta de la matriz original.
      */
 
-    public boolean comprobarSudoku() {
-        for (int i = 0; i < sudoku.length; i++) {
-            for (int j = 0; j < sudoku[0].length; j++) {
-                int aux = sudoku[i][j];
-                if (!validateRow(i, aux, j) || !validateColumn(j, aux, i) || !validateBlock(i, j, aux)) {
-                    return false;
-                }
+    private int[][] copyMatrix(int[][] original) {
+        int[][] copy = new int[original.length][original[0].length];
+        for (int i = 0; i < original.length; i++) {
+            for (int j = 0; j < original[0].length; j++) {
+                copy[i][j] = original[i][j];
             }
         }
-        return true;
+        return copy;
     }
+
+    /**
+     * Obtiene la solución completa del Sudoku.
+     *
+     * @return La matriz de solución del Sudoku.
+     */
+
+    public int[][] getSolucion() {
+        return solucion;
+    }
+
+
+
 
     /**
      * Verifica si el Sudoku ha sido completado correctamente.
@@ -286,7 +272,13 @@ public class Sudoku {
         for (int i = 0; i < sudoku.length; i++) {
             for (int j = 0; j < sudoku[0].length; j++) {
                 if (sudoku[i][j] == 0) { // Si la casilla está vacía
-                    for (int value = 1; value <= 6; value++) { // Probar valores del 1 al 6
+                    // Crear una lista con los valores posibles (1 a 6)
+                    List<Integer> valores = Arrays.asList(1, 2, 3, 4, 5, 6);
+                    // Mezclar los valores para probar en un orden aleatorio
+                    Collections.shuffle(valores);
+
+                    // Probar los valores en el orden aleatorio
+                    for (int value : valores) {
                         // Validar fila, columna y bloque ignorando la casilla actual
                         if (validateRow(i, value, j) && validateColumn(j, value, i) && validateBlock(i, j, value)) {
                             sudoku[i][j] = value; // Asignar el valor
@@ -302,6 +294,7 @@ public class Sudoku {
         }
         return true; // Sudoku resuelto
     }
+
 
     /**
 
@@ -373,18 +366,9 @@ public class Sudoku {
      @param num El número a validar.
      @param listTxt La matriz de TextField que representa el sudoku.
      @return true si el número es válido, false en caso contrario. */
-
     public boolean isNumberValid(int fila, int columna, int num, TextField[][] listTxt) {
         return validateRow1(fila, num, columna, listTxt) && validateColumn1(columna, num, fila, listTxt) && validateBlock1(fila, columna, num, listTxt);
     }
-    /**
-
-     Valida si un número es válido para una row específica, ignorando una column, en el contexto de una matriz de TextField.
-     @param row La row a validar.
-     @param num El número a validar.
-     @param column La column que se debe ignorar.
-     @param listTxt La matriz de TextField que representa el sudoku.
-     @return true si el número es válido, false en caso contrario. */
 
     private boolean validateRow1(int row, int num, int column, TextField[][] listTxt) {
         for (int j = 0; j < 6; j++) {
@@ -394,14 +378,6 @@ public class Sudoku {
         }
         return true;
     }
-    /**
-
-     Valida si un número es válido para una columna específica, ignorando una row, en el contexto de una matriz de TextField.
-     @param column La columna a validar.
-     @param num El número a validar.
-     @param row La row que se debe ignorar.
-     @param listTxt La matriz de TextField que representa el sudoku.
-     @return true si el número es válido, false en caso contrario. */
 
     private boolean validateColumn1(int column, int num, int row, TextField[][] listTxt) {
         for (int i = 0; i < 6; i++) {
@@ -412,20 +388,11 @@ public class Sudoku {
         return true;
     }
 
-    /**
-
-     Valida si un número es válido para un bloque específico, en el contexto de una matriz de TextField.
-     @param row La row del bloque.
-     @param column La column del bloque.
-     @param num El número a validar.
-     @param listTxt La matriz de TextField que representa el sudoku.
-     @return true si el número es válido, false en caso contrario. */
-
     private boolean validateBlock1(int row, int column, int num, TextField[][] listTxt) {
-        int filaInicio = (row / 2) * 2; // Cada bloque tiene 2 filas
-        int colInicio = (column / 3) * 3; // Cada bloque tiene 3 columnas
-        for (int i = filaInicio; i < filaInicio + 2; i++) { // 2 filas por bloque
-            for (int j = colInicio; j < colInicio + 3; j++) { // 3 columnas por bloque
+        int filaInicio = (row / 2) * 2;
+        int colInicio = (column / 3) * 3;
+        for (int i = filaInicio; i < filaInicio + 2; i++) {
+            for (int j = colInicio; j < colInicio + 3; j++) {
                 if ((i != row || j != column) && getTextFieldValue1(i, j, listTxt) == num) {
                     return false;
                 }
@@ -434,18 +401,11 @@ public class Sudoku {
         return true;
     }
 
-    /**
-
-     Obtiene el valor numérico de un TextField en una matriz de TextField.
-     @param fila La fila del TextField.
-     @param columna La columna del TextField.
-     @param listaTxt La matriz de TextField.
-     @return El valor numérico del TextField, o 0 si está vacío. */
-
-    private int getTextFieldValue1(int fila, int columna, TextField[][] listaTxt) {
-        String text = listaTxt[fila][columna].getText();
+    private int getTextFieldValue1(int fila, int columna, TextField[][] listTxt) {
+        String text = listTxt[fila][columna].getText();
         return text.isEmpty() ? 0 : Integer.parseInt(text);
     }
+
 
     /**
 
