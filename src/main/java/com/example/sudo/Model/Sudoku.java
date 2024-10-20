@@ -366,9 +366,20 @@ public class Sudoku {
      @param num El número a validar.
      @param listTxt La matriz de TextField que representa el sudoku.
      @return true si el número es válido, false en caso contrario. */
+
     public boolean isNumberValid(int fila, int columna, int num, TextField[][] listTxt) {
         return validateRow1(fila, num, columna, listTxt) && validateColumn1(columna, num, fila, listTxt) && validateBlock1(fila, columna, num, listTxt);
     }
+
+    /**
+
+     Valida si un número es válido para una fila específica, ignorando una columna.
+     @param row La fila a validar.
+     @param num El número a validar.
+     @param column La columna que se debe ignorar.
+     @param listTxt La matriz de TextField que representa el sudoku.
+     @return true si el número es válido, false en caso contrario. */
+
 
     private boolean validateRow1(int row, int num, int column, TextField[][] listTxt) {
         for (int j = 0; j < 6; j++) {
@@ -378,6 +389,14 @@ public class Sudoku {
         }
         return true;
     }
+    /**
+
+     Valida si un número es válido para una columna específica, ignorando una fila.
+     @param column La columna a validar.
+     @param num El número a validar.
+     @param row La fila que se debe ignorar.
+     @param listTxt La matriz de TextField que representa el sudoku.
+     @return true si el número es válido, false en caso contrario. */
 
     private boolean validateColumn1(int column, int num, int row, TextField[][] listTxt) {
         for (int i = 0; i < 6; i++) {
@@ -387,6 +406,20 @@ public class Sudoku {
         }
         return true;
     }
+    /**
+
+     Valida si un número es válido para un bloque específico.
+
+     @param row La fila del bloque.
+
+     @param column La columna del bloque.
+
+     @param num El número a validar.
+
+     @param listTxt La matriz de TextField que representa el sudoku.
+
+     @return true si el número es válido, false en caso contrario.
+     */
 
     private boolean validateBlock1(int row, int column, int num, TextField[][] listTxt) {
         int filaInicio = (row / 2) * 2;
@@ -400,6 +433,18 @@ public class Sudoku {
         }
         return true;
     }
+
+
+    /**
+     * Obtiene el valor de un campo de texto en una matriz de TextField en las coordenadas dadas.
+     * Si el campo de texto está vacío, devuelve 0. Si no está vacío, convierte el contenido
+     * en un número entero y lo devuelve.
+     *
+     * @param fila     El índice de la fila del campo de texto en la matriz.
+     * @param columna  El índice de la columna del campo de texto en la matriz.
+     * @param listTxt  La matriz de TextField de donde se obtiene el valor.
+     * @return El valor numérico del campo de texto si no está vacío, o 0 si está vacío.
+     */
 
     private int getTextFieldValue1(int fila, int columna, TextField[][] listTxt) {
         String text = listTxt[fila][columna].getText();
