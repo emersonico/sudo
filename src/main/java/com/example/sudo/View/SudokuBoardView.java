@@ -348,6 +348,7 @@ public class SudokuBoardView extends Pane {
 
         // Si no hay celdas vacías, no hacer nada
         if (emptyCells.isEmpty()) {
+            alertHandler.showSuccess("No hay celdas vacías para sugerir.");
             System.out.println("No hay celdas vacías para sugerir.");
             return;
         }
