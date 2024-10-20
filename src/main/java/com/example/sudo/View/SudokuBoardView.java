@@ -2,11 +2,16 @@ package com.example.sudo.View;
 
 import com.example.sudo.Model.Sudoku;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.function.UnaryOperator;
+
 /**
  * Esta clase representa la vista del tablero del Sudoku, manejando la interfaz
  * gráfica y las interacciones del usuario con el tablero.
@@ -32,6 +37,7 @@ public class SudokuBoardView extends Pane {
     private Sudoku sudoku;
     private ArrayList<TextField> generatedTxtList;
     private AlertHandler alertHandler;
+    private int maxAttempts = 0;
 
     /**
      * Constructor de la clase. Inicializa los componentes y crea un nuevo objeto de Sudoku.
@@ -67,6 +73,7 @@ public class SudokuBoardView extends Pane {
      * Crea y configura los campos de texto que representan cada celda del Sudoku,
      * ubicándolos en el tablero con márgenes y tamaños específicos.
      */
+
 
     public void createTxtField() {
         int x = txtMargin;
@@ -116,6 +123,8 @@ public class SudokuBoardView extends Pane {
      * Los números generados se añaden a la lista {@code generatedTxtList}.
      */
 
+
+
     public void generateSudoku() {
         clearTxt();
         sudoku.generateSudoku(listTxt);
@@ -130,11 +139,13 @@ public class SudokuBoardView extends Pane {
             }
         }
     }
+
     /**
      * Completa el tablero de Sudoku mostrando todos los números en los campos de texto.
      */
 
-    public void completeSudoku(){
+
+    public void completeSudoku() {
         sudoku.showSudoku();
         int [][] sudokuGenerated = sudoku.getSudoku();
         for(int i = 0; i < sudokuGenerated.length; i++) {
@@ -166,112 +177,78 @@ public class SudokuBoardView extends Pane {
 
     /**
      * Valida la entrada del usuario en un campo de texto específico, verificando si el número
-     * es válido para la fila y columna correspondientes.
+     * es válido para la row y column correspondientes.
      *
      * @param txt El campo de texto que contiene la entrada del usuario.
-     * @param fila La fila del tablero.
-     * @param columna La columna del tablero.
+     * @param row La row del tablero.
+     * @param column La column del tablero.
      * @param num El número ingresado por el usuario.
      */
-    private void validateInput(TextField txt, int fila, int columna, int num) {
-        boolean isValid = sudoku.isNumberValid(fila, columna, num, listTxt);
-
+    private void validateInput(TextField txt, int row, int column, int num) {
+        //System.out.println("Validando: row=" + row + ", column=" + column + ", num=" + num);
+        boolean isValid = sudoku.isNumberValid(row, column, num, listTxt);
+        //System.out.println("Número valido: " + isValid);
         if (!isValid) {
             txt.setStyle("-fx-border-color: red; -fx-border-width: 2px;");
         } else {
-            txt.setStyle(""); // Restaurar el estilo predeterminado si el número es válido
+            txt.setStyle("");
         }
     }
+
 
     /**
      * Genera eventos para los campos de texto, controlando la entrada de datos del usuario,
      * la validación y el comportamiento de foco.
      *
      * @param txt El campo de texto al que se le añaden los eventos.
-     * @param fila La fila del tablero asociada al campo de texto.
-     * @param columna La columna del tablero asociada al campo de texto.
+     * @param row La row del tablero asociada al campo de texto.
+     * @param column La column del tablero asociada al campo de texto.
      */
 
 
-    public void generateEvents(TextField txt, int fila, int columna) {
+    public void generateEvents(TextField txt, int row, int column) {
+        // Establecer el TextFormatter para permitir solo un número del 1 al 6
+        UnaryOperator<TextFormatter.Change> filter = change -> {
+            String newText = change.getControlNewText();
+
+
+            if (newText.matches("[1-6]?")) {
+                return change;  // Permitir el cambio
+            }
+            return null;  // Bloquear cualquier otro cambio
+        };
+
+        TextFormatter<String> textFormatter = new TextFormatter<>(filter);
+        txt.setTextFormatter(textFormatter);
+
+
         txt.setOnMousePressed(event -> pressed(txt));
+
+
         txt.setOnKeyPressed(event -> {
             KeyCode code = event.getCode();
 
-
             if (txtGenerated(txt)) {
                 event.consume();
                 return;
             }
-
 
             if (code == KeyCode.BACK_SPACE || code == KeyCode.DELETE) {
                 txt.clear();
-                validateInput(txt, fila, columna, -1);
-            }
-
-            else if (code.isDigitKey()) {
-                String input = event.getText();
-                if (input.matches("[1-6]")) {
-                    txt.setText(input);
-                    validateInput(txt, fila, columna, Integer.parseInt(input));
-                } else {
-                    event.consume();
-                }
-            } else {
+                validateInput(txt, row, column, -1);
                 event.consume();
             }
         });
 
 
-        txt.setOnKeyTyped(event -> {
-            if (txtGenerated(txt)) {
-                event.consume();
-                return;
-            }
-            String input = event.getCharacter();
-
-            if (!input.matches("[1-6]") || txt.getText().length() >= 1) {
-                event.consume();
-            }
-        });
-
-
-        txt.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue) {
-                if (txt.getText().isEmpty()) {
-                    txt.setStyle("");
-                } else {
-                    validateInput(txt, fila, columna, Integer.parseInt(txt.getText()));
-                }
-            } else {
-                if (!txtGenerated(txt)) {
-                    txt.clear();
-                }
+        txt.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.isEmpty()) {
+                int value = Integer.parseInt(newValue);
+                validateInput(txt, row, column, value);
             }
         });
     }
 
-
-   /* public void resolver(){
-        sudoku.limpiarSudoku();
-        for(int i = 0; i < listTxt.length; i++){
-            for (int j = 0; j < listTxt[0].length; j++){
-                if (!listTxt[i][j].getText().isEmpty()){
-                    sudoku.getSudoku()[i][j] = Integer.parseInt(listTxt[i][j].getText());
-                }
-            }
-        }
-        if (sudoku.resolveSudoku()){
-            for (int i = 0; i < listTxt.length; i++){
-                for (int j = 0; j < listTxt[0].length; j++){
-                    listTxt[i][j].setText(String.valueOf(sudoku.getSudoku()[i][j]));
-                }
-            }
-        } else {
-            System.out.println("sin solucion");
-        }
-    } */
     /**
      * Valida el estado actual del tablero de Sudoku verificando si todas las celdas están llenas.
      * Si el tablero está incompleto, imprime un mensaje indicando que faltan datos.
@@ -348,31 +325,50 @@ public class SudokuBoardView extends Pane {
      */
 
     public void help() {
-
+        // Limpiar sugerencias anteriores
         for (int row = 0; row < 6; row++) {
             for (int column = 0; column < 6; column++) {
                 if (listTxt[row][column].getStyle().contains("yellow")) {
-                    listTxt[row][column].setStyle("");
-                    listTxt[row][column].clear();
+                    listTxt[row][column].setStyle(""); // Restaurar estilo predeterminado
+                    listTxt[row][column].clear(); // Limpiar el valor sugerido
                 }
             }
         }
 
+        // Crear una lista de celdas vacías
+        List<int[]> emptyCells = new ArrayList<>();
+        int[][] currentSudoku = sudoku.getSudoku();
         for (int row = 0; row < 6; row++) {
             for (int column = 0; column < 6; column++) {
-                if (sudoku.getSudoku()[row][column] == 0 && listTxt[row][column].getText().isEmpty()) {
-                    for (int num = 1; num <= 6; num++) {
-                        if (sudoku.isNumberValid(row, column, num, listTxt)) {
-
-                            listTxt[row][column].setText(String.valueOf(num));
-                            listTxt[row][column].setStyle("-fx-background-color: yellow;");
-                            return;
-                        }
-                    }
+                if (currentSudoku[row][column] == 0 && listTxt[row][column].getText().isEmpty()) {
+                    emptyCells.add(new int[]{row, column});
                 }
             }
         }
+
+        // Si no hay celdas vacías, no hacer nada
+        if (emptyCells.isEmpty()) {
+            System.out.println("No hay celdas vacías para sugerir.");
+            return;
+        }
+
+        // Seleccionar una celda vacía aleatoria
+        Random random = new Random();
+        int[] randomCell = emptyCells.get(random.nextInt(emptyCells.size()));
+        int randomRow = randomCell[0];
+        int randomColumn = randomCell[1];
+
+        // Mostrar el número de la solución en la celda seleccionada
+        int[][] solucion = sudoku.getSolucion();
+        int correctValue = solucion[randomRow][randomColumn];
+        listTxt[randomRow][randomColumn].setText(String.valueOf(correctValue));
+        listTxt[randomRow][randomColumn].setEditable(false); // Deshabilitar edición en la celda
+
+        // Cambiar el estilo de la celda para resaltarla
+        listTxt[randomRow][randomColumn].setStyle("-fx-background-color: yellow;"); // Resaltar con color amarillo
     }
+
+
 
     /**
      * Establece el color de fondo del tablero de Sudoku y su tamaño.

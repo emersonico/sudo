@@ -14,7 +14,7 @@ import javafx.scene.paint.Color;
  */
 
 public class SudokuController {
-    private SudokuBoardView tableroSudoku;
+    private SudokuBoardView sudokuBoard;
 
     @FXML
     private Pane panelFondo;
@@ -31,29 +31,29 @@ public class SudokuController {
 
     public void startComponents() {
         this.alertHandler = new AlertAdapter();
-        this.tableroSudoku = new SudokuBoardView();
-        tableroSudoku.setTxtAltura(36);
-        tableroSudoku.setTxWidth(36);
-        tableroSudoku.setTxtLetterSize(27);
+        this.sudokuBoard = new SudokuBoardView();
+        sudokuBoard.setTxtAltura(36);
+        sudokuBoard.setTxWidth(36);
+        sudokuBoard.setTxtLetterSize(27);
 
         //tableroSudoku.setPanelBackground(new Color(89,43,25));
 
-        tableroSudoku.setLayoutX(20);
-        tableroSudoku.setLayoutY(80);
+        sudokuBoard.setLayoutX(20);
+        sudokuBoard.setLayoutY(80);
 
-        tableroSudoku.setTxtBackground1(Color.WHITE);
-        tableroSudoku.setTextForeground1(Color.BLACK);
-        tableroSudoku.setTxtBackground2(new Color((double) 232 / 255, (double) 102 / 255, (double) 102 / 255, 0));
-        tableroSudoku.setTextForeground2(Color.BLACK);
-        tableroSudoku.setTxtBackground3(new Color((double) 232 / 255, (double) 102 / 255, (double) 102 / 255, 0));
-        tableroSudoku.setTextForeground3(Color.WHITE);
+        sudokuBoard.setTxtBackground1(Color.WHITE);
+        sudokuBoard.setTextForeground1(Color.BLACK);
+        sudokuBoard.setTxtBackground2(new Color((double) 232 / 255, (double) 102 / 255, (double) 102 / 255, 0));
+        sudokuBoard.setTextForeground2(Color.BLACK);
+        sudokuBoard.setTxtBackground3(new Color((double) 232 / 255, (double) 102 / 255, (double) 102 / 255, 0));
+        sudokuBoard.setTextForeground3(Color.WHITE);
 
 
-        panelFondo.getChildren().add(tableroSudoku);
+        panelFondo.getChildren().add(sudokuBoard);
 
-        tableroSudoku.setVisible(true);
-        tableroSudoku.makeSudoku();
-        tableroSudoku.generateSudoku();
+        sudokuBoard.setVisible(true);
+        sudokuBoard.makeSudoku();
+        sudokuBoard.generateSudoku();
 
 
     }
@@ -69,7 +69,7 @@ public class SudokuController {
     void onNewGamePressedButton(ActionEvent event) {
 
         alertHandler.showConfirmation("¿Seguro que desea iniciar una nueva partida?", () -> {
-            tableroSudoku.generateSudoku();
+            sudokuBoard.generateSudoku();
             System.out.println("Nueva partida iniciada.");
         });
         System.out.println("Hola");
@@ -84,7 +84,7 @@ public class SudokuController {
      */
     @FXML
     void onValidateButton(ActionEvent event) {
-        tableroSudoku.validate();
+        sudokuBoard.validate();
 
     }
 
@@ -96,7 +96,7 @@ public class SudokuController {
      */
     @FXML
     public void onHelpButton(ActionEvent actionEvent) {
-        tableroSudoku.help();
+        sudokuBoard.help();
     }
 
     /**
@@ -109,6 +109,6 @@ public class SudokuController {
     @FXML
     void onResolveButton(ActionEvent event) {
         // tableroSudoku.resolver();
-        tableroSudoku.completeSudoku();}
+        sudokuBoard.completeSudoku();}
 
 }
